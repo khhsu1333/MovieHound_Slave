@@ -10,6 +10,11 @@ exports.index = function(req, res, next) {
 	res.render('index', { title: 'Express' });	
 };
 
+// GET test alive
+exports.alive = function(req, res, next) {
+	res.send('Y');
+};
+
 // GET uploaded image.
 exports.image = function(req, res, next) {
 	path = './media/' + req.params[0];
@@ -54,19 +59,8 @@ exports.upload_metadata = function(req, res, next) {
 exports.upload_snapshot = function(req, res, next) {
 	var file =req.files.snapshot;
 	if(file != null) {
-		if('image/jpeg' == file.mimetype) {
-			path = './media/' + file.originalname.slice(0, file.originalname.lastIndexOf("-"));
-			// Create folder if it doesnot exist
-			mkdirp(path);
-			path = path + '/' + file.originalname;
-
-			// Write file
-			fs.readFile(file.path, function (err, data) {
-				fs.writeFile(path, data);
-			});
-		}
-		// Remove tmp file
-		fs.unlink(file.path);
+		if('image/jpeg' != file.mimetype)
+			fs.unlink(file.path);
 	}
 	res.send({ error : undefined });
 };
@@ -76,27 +70,26 @@ exports.search = function(req, res, next) {
 	var db = req.db;
 	var hash = req.param('hash');
 
-	if(hash == null) res.end();
-	
-	// Search DB
-	db.collection('metadata').find({}, function(err, cursor) {
-		cursor.toArray(function(err, documents) {
-			var snapshotList = []
-			
-			// Calculate hamming distance
-			for(i=0; i < documents.length; i++) {
-				dis = utils.hamdist(hash, documents[i].hash);
-				if(dis < 6 && dis >= 0) {
-					documents[i].distance = dis;
-					snapshotList.push(documents[i]);
+	if(hash != null)  {
+		// Search DB
+		db.collection('metadata').find({}, function(err, cursor) {
+			cursor.toArray(function(err, documents) {
+				var snapshotList = [];
+				
+				// Calculate hamming distance
+				for(i=0; i < documents.length; i++) {
+					dis = utils.hamdist(hash, documents[i].hash);
+					if(dis < 6 && dis >= 0) {
+						documents[i].distance = dis;
+						snapshotList.push(documents[i]);
+					}
 				}
-			}
-
-			// Sort the list and get top 10 snapshots
-			utils.sortResults(snapshotList, 'distance', true);
-
-			// Response matched list
-			res.json(snapshotList.slice(0, snapshotList.length >= 10 ? 10 : snapshotList.length));	
+				
+				// Response matched list
+				res.json(snapshotList.slice(0, snapshotList.length >= 10 ? 10 : snapshotList.length));	
+			});
 		});
-	});
+	} else {
+		res.status(404).end();
+	}
 };

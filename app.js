@@ -27,13 +27,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set upload folder
-app.use(multer({ dest:'./media' }));
+app.use(multer({ 
+    dest : './media',
+    rename: function (fieldname, filename) {
+        return filename;
+    },
+ }));
 // Make our db accessible to our router
 app.use(function(req,res,next){
     req.db = db;
     next();
 });
 app.get('/', routes.index);
+app.get('/alive', routes.alive);
 app.get('/image/:path', routes.image);
 app.get('/metadata/:movie?', routes.metadata);
 app.post('/upload_metadata', routes.upload_metadata);
