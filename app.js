@@ -39,7 +39,6 @@ app.use(function(req,res,next){
     next();
 });
 app.get('/', routes.index);
-app.get('/alive', routes.alive);
 app.get('/image/:path', routes.image);
 app.get('/metadata/:movie?', routes.metadata);
 app.post('/upload_metadata', routes.upload_metadata);
@@ -76,6 +75,40 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
+// Routine
+var fs = require('fs'),
+request = require('request');
+var download = function(url, filename, callback){
+    request.head(url, function(err, res, body) {
+        request(url).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
+
+function heartbeat() {
+    console.log('Test slave speed.');
+    // Download a picture
+    var start = new Date();
+
+    download('http://localhost:8000/images/test.jpg', 'media/test.png', function() {
+        var end = new Date();
+        var time = end - start;
+        // Send heartbeat
+        console.log(time);
+
+        request.post(
+            'http://localhost:8000/heartbeat',
+            { form: { ip: 'localhost:3000', speed: time } },
+            function (error, response, body) {
+                if (! error && response.statusCode == 200) {
+                    console.log(body);
+                }
+            }
+        );
+    });
+}
+
+setInterval(heartbeat, 5000);
 
 
 module.exports = app;

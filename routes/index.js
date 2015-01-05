@@ -10,11 +10,6 @@ exports.index = function(req, res, next) {
 	res.render('index', { title: 'Express' });	
 };
 
-// GET test alive
-exports.alive = function(req, res, next) {
-	res.send('Y');
-};
-
 // GET uploaded image.
 exports.image = function(req, res, next) {
 	path = './media/' + req.params[0];
@@ -84,7 +79,7 @@ exports.search = function(req, res, next) {
 						snapshotList.push(documents[i]);
 					}
 				}
-				
+
 				// Response matched list
 				res.json(snapshotList.slice(0, snapshotList.length >= 10 ? 10 : snapshotList.length));	
 			});

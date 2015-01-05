@@ -17,6 +17,7 @@
     "mkdirp":"*",
     "mongodb": "*",
     "mongoskin": "*",
-    "multer":"*"
+    "multer":"*",
+    "request":"*"
   }
 }
