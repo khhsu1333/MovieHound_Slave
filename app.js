@@ -76,7 +76,13 @@ app.use(function(err, req, res, next) {
     });
 });
 
-// Routine
+// 每分鐘傳送 Heartbeat 給 Master
+// 設定區塊開始
+myName = '我的電腦'
+myIP = 'localhost:3000'
+masterIP = 'localhost:8000'
+
+// 設定區塊結束
 var fs = require('fs'),
 request = require('request');
 var download = function(url, filename, callback){
@@ -90,25 +96,28 @@ function heartbeat() {
     // Download a picture
     var start = new Date();
 
-    download('http://localhost:8000/images/test.jpg', 'media/test.png', function() {
+    download('http://' + masterIP + '/images/test.jpg', 'media/test.png', function() {
         var end = new Date();
         var time = end - start;
-        // Send heartbeat
-        console.log(time);
+        fs.readdir('./media', function (err, files) {
+            var amount = files.length-3;
 
-        request.post(
-            'http://localhost:8000/heartbeat',
-            { form: { ip: 'localhost:3000', speed: time } },
-            function (error, response, body) {
-                if (! error && response.statusCode == 200) {
-                    console.log(body);
+            // Send heartbeat
+            request.post(
+                'http://' + masterIP + '/heartbeat',
+                { form: { name:myName, IP:myIP, speed:time, timestamp:end, amount:amount } },
+                function (error, response, body) {
+                    if (! error && response.statusCode == 200)  {
+                        console.log('Send successfully.\n')
+                    }
                 }
-            }
-        );
+            );
+        });
     });
 }
 
-setInterval(heartbeat, 5000);
+// 啟動 Heartbeat
+//setInterval(heartbeat, 60000);
 
 
 module.exports = app;
