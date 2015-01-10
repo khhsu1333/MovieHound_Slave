@@ -78,7 +78,7 @@ app.use(function(err, req, res, next) {
 
 // 每分鐘傳送 Heartbeat 給 Master
 // 設定區塊開始
-myName = '我的電腦'
+myName = 'MyName'
 myIP = 'localhost:3000'
 masterIP = 'localhost:8000'
 
@@ -100,7 +100,7 @@ function heartbeat() {
         var end = new Date();
         var time = end - start;
         fs.readdir('./media', function (err, files) {
-            var amount = files.length-3;
+            var amount = files.length-2;
 
             // Send heartbeat
             request.post(
@@ -117,7 +117,7 @@ function heartbeat() {
 }
 
 // 啟動 Heartbeat
-//setInterval(heartbeat, 60000);
+//setInterval(heartbeat, 20000);
 
 
 module.exports = app;
