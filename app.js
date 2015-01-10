@@ -105,7 +105,7 @@ function heartbeat() {
             // Send heartbeat
             request.post(
                 'http://' + masterIP + '/heartbeat',
-                { form: { name:myName, IP:myIP, speed:time, timestamp:end, amount:amount } },
+                { form: { name:myName, IP:myIP, speed:(1/time), timestamp:end, amount:amount } },
                 function (error, response, body) {
                     if (! error && response.statusCode == 200)  {
                         console.log('Send successfully.\n')
