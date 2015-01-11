@@ -80,6 +80,9 @@ exports.search = function(req, res, next) {
 					}
 				}
 
+				// Sort snapshot list
+				utils.sortResults(snapshotList, 'distance', true);
+
 				// Response matched list
 				res.json(snapshotList.slice(0, snapshotList.length >= 10 ? 10 : snapshotList.length));	
 			});
