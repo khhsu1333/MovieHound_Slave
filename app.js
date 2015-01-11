@@ -117,7 +117,7 @@ function heartbeat() {
 }
 
 // 啟動 Heartbeat
-//setInterval(heartbeat, 20000);
+setInterval(heartbeat, 10000);
 
 
 module.exports = app;

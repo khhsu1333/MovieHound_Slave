@@ -12,7 +12,7 @@ exports.index = function(req, res, next) {
 
 // GET uploaded image.
 exports.image = function(req, res, next) {
-	path = './media/' + req.params[0];
+	path = './media/' + req.params['path'];
 	fs.exists(path, function(exists) {
 		if (exists)
 			res.sendfile(path);
