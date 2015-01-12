@@ -2,11 +2,11 @@ module.exports = {
 	hamdist : function (s1, s2)
 	{  
 	   if(s1 == undefined || s2 == undefined) return -1;
-	   if (s1.length != s2.length) return -1;
+	   if (s1.length < 16 || s2.length < 16) return -1;
 	   
 	   var distance = 0;
 	   
-	   for(var i = 0; i < s1.length; i++)
+	   for(var i = 0; i < 16; i++)
 	      if (s1.charAt(i) != s2.charAt(i))
 	         distance++;
 	   return distance;
