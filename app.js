@@ -96,28 +96,34 @@ function heartbeat() {
     // Download a picture
     var start = new Date();
 
-    download('http://' + masterIP + '/images/test.jpg', 'media/test.png', function() {
-        var end = new Date();
-        var time = end - start;
-        fs.readdir('./media', function (err, files) {
-            var amount = files.length-2;
+    request.get('http://' + masterIP, function (error, response, body) {
+        if(error != undefined) {
+             console.log('Master Not Found!!\n');
+        } else {
+            download('http://' + masterIP + '/images/test.jpg', 'media/test.png', function() {
+                var end = new Date();
+                var time = end - start;
+                fs.readdir('./media', function (err, files) {
+                    var amount = files.length-2;
 
-            // Send heartbeat
-            request.post(
-                'http://' + masterIP + '/heartbeat',
-                { form: { name:myName, IP:myIP, speed:(1/time), timestamp:end, amount:amount } },
-                function (error, response, body) {
-                    if (! error && response.statusCode == 200)  {
-                        console.log('Send successfully.\n')
-                    }
-                }
-            );
-        });
+                    // Send heartbeat
+                    request.post(
+                        'http://' + masterIP + '/heartbeat',
+                        { form: { name:myName, IP:myIP, speed:(1/time), timestamp:end, amount:amount } },
+                        function (error, response, body) {
+                            if (! error && response.statusCode == 200)  {
+                                console.log('Send successfully.\n')
+                            }
+                        }
+                    );
+                });
+            });
+        }
     });
 }
 
 // 啟動 Heartbeat
-setInterval(heartbeat, 10000);
+setInterval(heartbeat, 20000);
 
 
 module.exports = app;
